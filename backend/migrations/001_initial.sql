@@ -1,3 +1,21 @@
 -- Initial schema is applied idempotently by SQLAlchemy metadata.create_all.
--- Authoritative entities: users, nodes, request_sets, trials, audit_logs.
+-- Authoritative entities: users, nodes, request_sets, windows, trials, audit_logs.
 -- Routing request events and frozen input/result evidence are MySQL JSON.
+--
+-- 共享演练窗口新增字段（create_all 自动建表/建列；已存在的库需手动补齐）：
+-- ALTER TABLE nodes ADD COLUMN read_capacity INT NOT NULL DEFAULT 1;
+-- CREATE TABLE windows (
+--   id INT PRIMARY KEY AUTO_INCREMENT,
+--   name VARCHAR(120) NOT NULL,
+--   status VARCHAR(20) NOT NULL DEFAULT 'open',
+--   default_hold_ms INT NOT NULL,
+--   horizon_ms INT NOT NULL,
+--   config_snapshot JSON NOT NULL,
+--   result JSON NULL,
+--   error TEXT NULL,
+--   created_at DATETIME NULL,
+--   closed_at DATETIME NULL
+-- );
+-- ALTER TABLE trials ADD COLUMN window_id INT NULL,
+--   ADD COLUMN cancel_at_ms INT NULL,
+--   ADD CONSTRAINT fk_trials_window FOREIGN KEY (window_id) REFERENCES windows(id);
